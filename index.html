@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phiếu Kiểm Tra Trắc Nghiệm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Mô phỏng font chữ trên giấy thi truyền thống */
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #e5e7eb;
+        }
+        
+        /* Hiệu ứng hộp chấm điểm */
+        .score-box {
+            border: 3px solid #ef4444;
+            color: #ef4444;
+            border-radius: 4px;
+            transform: rotate(-3deg);
+        }
+
+        /* Định dạng radio button gọn gàng */
+        input[type="radio"] {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: #2563eb;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        .correct-answer {
+            background-color: #dcfce7; /* Xanh nhạt */
+            border: 1px solid #22c55e;
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        .wrong-answer {
+            background-color: #fee2e2; /* Đỏ nhạt */
+            border: 1px solid #ef4444;
+            border-radius: 4px;
+            padding: 4px;
+        }
+
+        /* Ẩn nút khi in */
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; }
+            .paper-container { box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body class="p-2 md:p-8">
+
+    <div class="paper-container max-w-4xl mx-auto bg-white shadow-2xl border border-gray-300 p-6 md:p-12 relative">
+        
+        <!-- Phần Header Giấy Thi -->
+        <div class="flex flex-col md:flex-row justify-between items-start border-b-2 border-black pb-4 mb-6">
+            <div class="text-center w-full md:w-5/12 mb-4 md:mb-0">
+                <h3 class="font-bold text-xl uppercase underline mt-1">TRƯỜNG THCS MỸ HÒA</h3>
+            </div>
+            <div class="text-center w-full md:w-7/12">
+                <h2 class="font-bold text-xl uppercase">LUYỆN TẬP BÀI NGUYÊN TỬ</h2>
+                <h3 class="font-bold text-lg mt-1">Môn: Khoa Học Tự Nhiên</h3>
+                <p class="italic mt-1">Thời gian làm bài: 15 phút (Không kể thời gian giao đề)</p>
+            </div>
+        </div>
+
+        <!-- Thông tin thí sinh & Hộp điểm -->
+        <div class="flex flex-col md:flex-row justify-between mb-8 gap-6">
+            <div class="flex-1 space-y-3 text-lg leading-relaxed md:pr-4">
+                <p><strong>Họ và tên thí sinh:</strong> ........................................................................</p>
+                <p><strong>Lớp:</strong> ......................................................................................................</p>
+            </div>
+            <div class="w-full md:w-1/2 shrink-0 pt-2">
+                <table class="w-full h-full border-collapse border-[3px] border-red-600 text-red-600 bg-white shadow-sm">
+                    <tr>
+                        <th class="border-[3px] border-red-600 p-2 w-1/3 text-center uppercase font-bold text-lg">Điểm</th>
+                        <th class="border-[3px] border-red-600 p-2 w-2/3 text-center uppercase font-bold text-lg">Lời phê của giáo viên</th>
+                    </tr>
+                    <tr>
+                        <td class="border-[3px] border-red-600 p-2 text-center align-middle h-32">
+                            <span id="score-display" class="font-bold text-4xl">.../10</span>
+                        </td>
+                        <td class="border-[3px] border-red-600 p-3 align-top">
+                            <p id="teacher-remark" class="italic text-lg text-red-600 font-medium text-center mt-6"></p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- Vùng chứa nội dung bài thi -->
+        <div id="exam-content" class="text-lg">
+            
+            <div class="mb-6 font-bold uppercase text-black border-b border-gray-300 pb-2">
+                I. Phần Trắc Nghiệm Nhiều Lựa Chọn (5 câu - 5 điểm)
+            </div>
+            <div id="mcq-container" class="space-y-6 mb-10 pl-2 md:pl-4">
+                <!-- Javascript sẽ render câu hỏi MCQ vào đây -->
+            </div>
+
+            <div class="mb-6 font-bold uppercase text-black border-b border-gray-300 pb-2">
+                II. Phần Câu Đúng/Sai (5 câu - 5 điểm)
+            </div>
+            <p class="italic text-base text-gray-700 mb-4 pl-2 md:pl-4">Chọn Đ (Đúng) hoặc S (Sai) cho mỗi nhận định sau:</p>
+            <div id="tf-container" class="space-y-6 mb-8 pl-2 md:pl-4">
+                <!-- Javascript sẽ render câu hỏi True/False vào đây -->
+            </div>
+
+        </div>
+
+        <!-- Nút thao tác -->
+        <div class="no-print flex flex-col sm:flex-row justify-center gap-4 mt-12 border-t pt-8">
+            <button id="submit-btn" onclick="submitExam()" class="bg-blue-700 hover:bg-blue-800 transition text-white font-bold py-3 px-8 rounded shadow-lg text-lg uppercase">
+                Nộp bài
+            </button>
+            <button id="reset-btn" onclick="initExam()" class="bg-gray-600 hover:bg-gray-700 transition text-white font-bold py-3 px-8 rounded shadow-lg text-lg uppercase">
+                Làm lại và đảo đề
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // Dữ liệu ngân hàng câu hỏi
+        const mcqBank = [
+            { q: "Nguyên tử là gì?", opts: [{t: "Hạt rất lớn cấu tạo nên vật chất", c: false}, {t: "Hạt vô cùng nhỏ cấu tạo nên chất", c: true}, {t: "Hạt mang điện tích âm", c: false}, {t: "Hạt chỉ có trong kim loại", c: false}] },
+            { q: "Nguyên tử gồm những loại hạt nào?", opts: [{t: "Proton và electron", c: false}, {t: "Proton, neutron và electron", c: true}, {t: "Neutron và electron", c: false}, {t: "Proton và neutron", c: false}] },
+            { q: "Hạt nào mang điện tích dương?", opts: [{t: "Electron", c: false}, {t: "Neutron", c: false}, {t: "Proton", c: true}, {t: "Nguyên tử", c: false}] },
+            { q: "Hạt nào không mang điện?", opts: [{t: "Proton", c: false}, {t: "Electron", c: false}, {t: "Neutron", c: true}, {t: "Ion", c: false}] },
+            { q: "Hạt nào mang điện tích âm?", opts: [{t: "Proton", c: false}, {t: "Electron", c: true}, {t: "Neutron", c: false}, {t: "Hạt nhân", c: false}] },
+            { q: "Hạt nhân nguyên tử gồm:", opts: [{t: "Proton và electron", c: false}, {t: "Electron và neutron", c: false}, {t: "Proton và neutron", c: true}, {t: "Chỉ có proton", c: false}] },
+            { q: "Electron chuyển động ở đâu trong nguyên tử?", opts: [{t: "Trong hạt nhân", c: false}, {t: "Xung quanh hạt nhân", c: true}, {t: "Ngoài nguyên tử", c: false}, {t: "Không chuyển động", c: false}] },
+            { q: "Nguyên tử trung hòa về điện khi:", opts: [{t: "Số proton = số neutron", c: false}, {t: "Số proton = số electron", c: true}, {t: "Số neutron = số electron", c: false}, {t: "Số proton = số khối", c: false}] },
+            { q: "Khối lượng nguyên tử tập trung chủ yếu ở đâu?", opts: [{t: "Electron", c: false}, {t: "Lớp vỏ", c: false}, {t: "Hạt nhân", c: true}, {t: "Bên ngoài nguyên tử", c: false}] },
+            { q: "Trong nguyên tử, hạt nào có khối lượng rất nhỏ so với các hạt còn lại?", opts: [{t: "Proton", c: false}, {t: "Neutron", c: false}, {t: "Electron", c: true}, {t: "Hạt nhân", c: false}] }
+        ];
+
+        const tfBank = [
+            { q: "Nguyên tử là hạt rất nhỏ cấu tạo nên chất.", c: true },
+            { q: "Nguyên tử có thể chia nhỏ trong các phản ứng hóa học thông thường.", c: false },
+            { q: "Proton mang điện tích dương.", c: true },
+            { q: "Electron mang điện tích âm.", c: true },
+            { q: "Neutron không mang điện.", c: true },
+            { q: "Hạt nhân nguyên tử chứa electron.", c: false },
+            { q: "Electron chuyển động xung quanh hạt nhân.", c: true },
+            { q: "Nguyên tử luôn mang điện tích dương.", c: false },
+            { q: "Số proton bằng số electron thì nguyên tử trung hòa điện.", c: true },
+            { q: "Khối lượng nguyên tử chủ yếu tập trung ở electron.", c: false }
+        ];
+
+        let currentMCQs = [];
+        let currentTFs = [];
+        let isSubmitted = false;
+
+        // Hàm xáo trộn mảng thuật toán Fisher-Yates
+        function shuffleArray(array) {
+            let arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Khởi tạo đề thi
+        function initExam() {
+            isSubmitted = false;
+            document.getElementById('score-display').innerText = ".../10";
+            document.getElementById('teacher-remark').innerText = "";
+            document.getElementById('submit-btn').disabled = false;
+            document.getElementById('submit-btn').classList.remove('opacity-50', 'cursor-not-allowed');
+
+            // Chọn ngẫu nhiên 5 câu từ mỗi ngân hàng
+            currentMCQs = shuffleArray(mcqBank).slice(0, 5);
+            currentTFs = shuffleArray(tfBank).slice(0, 5);
+
+            renderMCQs();
+            renderTFs();
+        }
+
+        // Render phần trắc nghiệm MCQ
+        function renderMCQs() {
+            const container = document.getElementById('mcq-container');
+            container.innerHTML = '';
+            
+            const labels = ['A', 'B', 'C', 'D'];
+
+            currentMCQs.forEach((question, qIndex) => {
+                // Xáo trộn cả đáp án
+                const shuffledOpts = shuffleArray(question.opts);
+                
+                let html = `
+                <div class="question-block" id="mcq-block-${qIndex}">
+                    <p class="font-bold mb-2">Câu ${qIndex + 1}: <span class="font-normal">${question.q}</span> <span id="mark-mcq-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">`;
+
+                shuffledOpts.forEach((opt, optIndex) => {
+                    html += `
+                        <label class="flex items-start gap-2 cursor-pointer p-1 rounded transition-colors" id="label-mcq-${qIndex}-${optIndex}">
+                            <input type="radio" name="mcq-${qIndex}" value="${opt.c}" class="mt-1">
+                            <span><span class="font-bold">${labels[optIndex]}.</span> ${opt.t}</span>
+                        </label>`;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // Render phần câu hỏi Đúng/Sai
+        function renderTFs() {
+            const container = document.getElementById('tf-container');
+            container.innerHTML = '';
+
+            currentTFs.forEach((question, qIndex) => {
+                let html = `
+                <div class="question-block flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-gray-200 pb-3" id="tf-block-${qIndex}">
+                    <p class="font-bold w-full md:w-3/4">Câu ${qIndex + 6}: <span class="font-normal">${question.q}</span> <span id="mark-tf-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
+                    <div class="flex gap-6 pl-4 md:pl-0 shrink-0">
+                        <label class="flex items-center gap-1 cursor-pointer p-1 rounded" id="label-tf-${qIndex}-true">
+                            <input type="radio" name="tf-${qIndex}" value="true">
+                            <span class="font-bold text-green-700">Đúng (Đ)</span>
+                        </label>
+                        <label class="flex items-center gap-1 cursor-pointer p-1 rounded" id="label-tf-${qIndex}-false">
+                            <input type="radio" name="tf-${qIndex}" value="false">
+                            <span class="font-bold text-red-700">Sai (S)</span>
+                        </label>
+                    </div>
+                </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // Chấm điểm
+        function submitExam() {
+            if(isSubmitted) return;
+            
+            let score = 0;
+
+            // Kiểm tra MCQ
+            currentMCQs.forEach((question, qIndex) => {
+                const selected = document.querySelector(`input[name="mcq-${qIndex}"]:checked`);
+                const allRadios = document.querySelectorAll(`input[name="mcq-${qIndex}"]`);
+                let isCorrect = false;
+                
+                // Highlight đáp án
+                allRadios.forEach((radio, optIndex) => {
+                    const label = document.getElementById(`label-mcq-${qIndex}-${optIndex}`);
+                    radio.disabled = true; // Khóa sau khi nộp
+                    
+                    if(radio.value === "true") {
+                        label.classList.add('correct-answer'); // Luôn hiện đáp án đúng
+                    }
+                    
+                    if(radio.checked) {
+                        if(radio.value === "true") {
+                            isCorrect = true;
+                        } else {
+                            label.classList.add('wrong-answer');
+                        }
+                    }
+                });
+
+                if (isCorrect) score++;
+                document.getElementById(`mark-mcq-${qIndex}`).innerText = isCorrect ? '✔' : '✘';
+            });
+
+            // Kiểm tra T/F
+            currentTFs.forEach((question, qIndex) => {
+                const selected = document.querySelector(`input[name="tf-${qIndex}"]:checked`);
+                const radioTrue = document.querySelector(`input[name="tf-${qIndex}"][value="true"]`);
+                const radioFalse = document.querySelector(`input[name="tf-${qIndex}"][value="false"]`);
+                const labelTrue = document.getElementById(`label-tf-${qIndex}-true`);
+                const labelFalse = document.getElementById(`label-tf-${qIndex}-false`);
+                
+                radioTrue.disabled = true;
+                radioFalse.disabled = true;
+
+                const correctStr = String(question.c); // "true" hoặc "false"
+                let isCorrect = false;
+
+                // Đánh dấu đáp án đúng
+                if(correctStr === "true") labelTrue.classList.add('correct-answer');
+                else labelFalse.classList.add('correct-answer');
+
+                // Kiểm tra lựa chọn của user
+                if(selected) {
+                    if(selected.value === correctStr) {
+                        isCorrect = true;
+                    } else {
+                        if(selected.value === "true") labelTrue.classList.add('wrong-answer');
+                        else labelFalse.classList.add('wrong-answer');
+                    }
+                }
+
+                if (isCorrect) score++;
+                document.getElementById(`mark-tf-${qIndex}`).innerText = isCorrect ? '✔' : '✘';
+            });
+
+            // Cập nhật điểm
+            const scoreDisplay = document.getElementById('score-display');
+            scoreDisplay.innerText = `${score}/10`;
+            
+            const remarkDisplay = document.getElementById('teacher-remark');
+            let remark = "";
+            if (score === 10) remark = "Xuất sắc! Em nắm vững kiến thức rất tốt.";
+            else if (score >= 8) remark = "Khá giỏi! Cố gắng phát huy nhé.";
+            else if (score >= 5) remark = "Đạt. Em cần cẩn thận và ôn tập thêm.";
+            else remark = "Chưa đạt. Em cần ôn kỹ lại lý thuyết bài này!";
+            remarkDisplay.innerText = remark;
+            
+            // Khóa nút nộp bài
+            isSubmitted = true;
+            document.getElementById('submit-btn').disabled = true;
+            document.getElementById('submit-btn').classList.add('opacity-50', 'cursor-not-allowed');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Chạy lần đầu khi load trang
+        window.onload = initExam;
+    </script>
+</body>
+</html>
