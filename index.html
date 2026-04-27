@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Phiếu Kiểm Tra Trắc Nghiệm</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -10,6 +10,7 @@
         body {
             font-family: 'Times New Roman', Times, serif;
             background-color: #e5e7eb;
+            -webkit-tap-highlight-color: transparent;
         }
         
         /* Hiệu ứng hộp chấm điểm */
@@ -22,69 +23,75 @@
 
         /* Định dạng radio button gọn gàng */
         input[type="radio"] {
-            width: 1.1rem;
-            height: 1.1rem;
+            width: 1.25rem;
+            height: 1.25rem;
             accent-color: #2563eb;
             cursor: pointer;
-            margin-top: 2px;
+            flex-shrink: 0;
+            margin-top: 3px;
         }
 
         .correct-answer {
             background-color: #dcfce7; /* Xanh nhạt */
             border: 1px solid #22c55e;
-            border-radius: 4px;
-            padding: 4px;
+            border-radius: 6px;
         }
 
         .wrong-answer {
             background-color: #fee2e2; /* Đỏ nhạt */
             border: 1px solid #ef4444;
-            border-radius: 4px;
-            padding: 4px;
+            border-radius: 6px;
         }
 
         /* Ẩn nút khi in */
         @media print {
             .no-print { display: none !important; }
-            body { background-color: white; }
-            .paper-container { box-shadow: none; border: none; }
+            body { background-color: white; padding: 0 !important; margin: 0 !important; }
+            .paper-container { box-shadow: none; border: none; padding: 0 !important; min-height: auto !important; }
         }
     </style>
 </head>
-<body class="p-2 md:p-8">
+<body class="m-0 p-0 md:p-6 lg:p-8 bg-gray-200">
 
-    <div class="paper-container max-w-4xl mx-auto bg-white shadow-2xl border border-gray-300 p-6 md:p-12 relative">
+    <div class="paper-container w-full min-h-screen md:min-h-0 md:max-w-4xl mx-auto bg-white md:shadow-2xl md:border border-gray-300 p-4 sm:p-6 md:p-12 relative flex flex-col">
         
         <!-- Phần Header Giấy Thi -->
-        <div class="flex flex-col md:flex-row justify-between items-start border-b-2 border-black pb-4 mb-6">
-            <div class="text-center w-full md:w-5/12 mb-4 md:mb-0">
-                <h3 class="font-bold text-xl uppercase underline mt-1">TRƯỜNG THCS MỸ HÒA</h3>
+        <div class="flex flex-col md:flex-row justify-between items-center md:items-start border-b-2 border-black pb-4 mb-6 gap-3">
+            <div class="text-center w-full md:w-5/12">
+                <h3 class="font-bold text-lg md:text-xl uppercase underline mt-1">TRƯỜNG THCS MỸ HÒA</h3>
             </div>
             <div class="text-center w-full md:w-7/12">
-                <h2 class="font-bold text-xl uppercase">LUYỆN TẬP BÀI NGUYÊN TỬ</h2>
-                <h3 class="font-bold text-lg mt-1">Môn: Khoa Học Tự Nhiên</h3>
-                <p class="italic mt-1">Thời gian làm bài: 15 phút (Không kể thời gian giao đề)</p>
+                <h2 class="font-bold text-xl md:text-2xl uppercase text-blue-900 md:text-black">LUYỆN TẬP BÀI NGUYÊN TỬ</h2>
+                <h3 class="font-bold text-base md:text-lg mt-1">Môn: Khoa Học Tự Nhiên</h3>
+                <p class="italic text-sm md:text-base mt-1">Thời gian làm bài: 15 phút (Không kể thời gian giao đề)</p>
             </div>
         </div>
 
         <!-- Thông tin thí sinh & Hộp điểm -->
-        <div class="flex flex-col md:flex-row justify-between mb-8 gap-6">
-            <div class="flex-1 space-y-3 text-lg leading-relaxed md:pr-4">
-                <p><strong>Họ và tên thí sinh:</strong> ........................................................................</p>
-                <p><strong>Lớp:</strong> ......................................................................................................</p>
+        <div class="flex flex-col-reverse md:flex-row justify-between mb-8 gap-6 md:gap-8 text-base md:text-lg">
+            <div class="w-full md:w-1/2 flex flex-col justify-center space-y-4">
+                <div class="flex items-end">
+                    <strong class="whitespace-nowrap mr-2">Họ và tên thí sinh:</strong>
+                    <div class="flex-1 border-b-2 border-dotted border-gray-500 h-5"></div>
+                </div>
+                <div class="flex items-end">
+                    <strong class="whitespace-nowrap mr-2">Lớp:</strong>
+                    <div class="flex-1 border-b-2 border-dotted border-gray-500 h-5"></div>
+                </div>
             </div>
-            <div class="w-full md:w-1/2 shrink-0 pt-2">
-                <table class="w-full h-full border-collapse border-[3px] border-red-600 text-red-600 bg-white shadow-sm">
+            
+            <div class="w-full md:w-1/2 flex justify-center shrink-0">
+                <table class="w-full max-w-sm border-collapse border-[3px] border-red-600 text-red-600 bg-white shadow-sm">
                     <tr>
-                        <th class="border-[3px] border-red-600 p-2 w-1/3 text-center uppercase font-bold text-lg">Điểm</th>
-                        <th class="border-[3px] border-red-600 p-2 w-2/3 text-center uppercase font-bold text-lg">Lời phê của giáo viên</th>
+                        <th class="border-[3px] border-red-600 p-2 w-1/3 text-center uppercase font-bold text-base md:text-lg">Điểm</th>
+                        <th class="border-[3px] border-red-600 p-2 w-2/3 text-center uppercase font-bold text-base md:text-lg">Lời phê của giáo viên</th>
                     </tr>
                     <tr>
-                        <td class="border-[3px] border-red-600 p-2 text-center align-middle h-32">
-                            <span id="score-display" class="font-bold text-4xl">.../10</span>
+                        <td class="border-[3px] border-red-600 p-2 text-center align-middle h-24 md:h-32">
+                            <span id="score-display" class="font-bold text-3xl md:text-4xl">.../10</span>
                         </td>
-                        <td class="border-[3px] border-red-600 p-3 align-top">
-                            <p id="teacher-remark" class="italic text-lg text-red-600 font-medium text-center mt-6"></p>
+                        <td class="border-[3px] border-red-600 p-2 align-top">
+                            <p id="teacher-remark" class="italic text-base md:text-lg text-red-600 font-medium text-center mt-3 md:mt-6"></p>
                         </td>
                     </tr>
                 </table>
@@ -92,31 +99,31 @@
         </div>
 
         <!-- Vùng chứa nội dung bài thi -->
-        <div id="exam-content" class="text-lg">
+        <div id="exam-content" class="text-base md:text-lg flex-1">
             
-            <div class="mb-6 font-bold uppercase text-black border-b border-gray-300 pb-2">
+            <div class="mb-4 md:mb-6 font-bold uppercase text-black border-b-2 border-gray-300 pb-2 bg-gray-50 md:bg-transparent p-2 md:p-0 rounded">
                 I. Phần Trắc Nghiệm Nhiều Lựa Chọn (5 câu - 5 điểm)
             </div>
-            <div id="mcq-container" class="space-y-6 mb-10 pl-2 md:pl-4">
+            <div id="mcq-container" class="space-y-6 md:space-y-8 mb-10 md:pl-2">
                 <!-- Javascript sẽ render câu hỏi MCQ vào đây -->
             </div>
 
-            <div class="mb-6 font-bold uppercase text-black border-b border-gray-300 pb-2">
+            <div class="mb-4 md:mb-6 font-bold uppercase text-black border-b-2 border-gray-300 pb-2 bg-gray-50 md:bg-transparent p-2 md:p-0 rounded mt-8">
                 II. Phần Câu Đúng/Sai (5 câu - 5 điểm)
             </div>
-            <p class="italic text-base text-gray-700 mb-4 pl-2 md:pl-4">Chọn Đ (Đúng) hoặc S (Sai) cho mỗi nhận định sau:</p>
-            <div id="tf-container" class="space-y-6 mb-8 pl-2 md:pl-4">
+            <p class="italic text-gray-700 mb-4 px-2 md:px-0">Chọn Đ (Đúng) hoặc S (Sai) cho mỗi nhận định sau:</p>
+            <div id="tf-container" class="space-y-6 mb-8 md:pl-2">
                 <!-- Javascript sẽ render câu hỏi True/False vào đây -->
             </div>
 
         </div>
 
         <!-- Nút thao tác -->
-        <div class="no-print flex flex-col sm:flex-row justify-center gap-4 mt-12 border-t pt-8">
-            <button id="submit-btn" onclick="submitExam()" class="bg-blue-700 hover:bg-blue-800 transition text-white font-bold py-3 px-8 rounded shadow-lg text-lg uppercase">
+        <div class="no-print flex flex-col md:flex-row justify-center gap-3 md:gap-4 mt-8 border-t border-gray-300 pt-6 pb-4">
+            <button id="submit-btn" onclick="submitExam()" class="w-full md:w-auto bg-blue-700 hover:bg-blue-800 active:bg-blue-900 transition text-white font-bold py-4 md:py-3 px-8 rounded-lg shadow text-lg uppercase">
                 Nộp bài
             </button>
-            <button id="reset-btn" onclick="initExam()" class="bg-gray-600 hover:bg-gray-700 transition text-white font-bold py-3 px-8 rounded shadow-lg text-lg uppercase">
+            <button id="reset-btn" onclick="initExam()" class="w-full md:w-auto bg-gray-600 hover:bg-gray-700 active:bg-gray-800 transition text-white font-bold py-4 md:py-3 px-8 rounded-lg shadow text-lg uppercase">
                 Làm lại và đảo đề
             </button>
         </div>
@@ -193,15 +200,15 @@
                 const shuffledOpts = shuffleArray(question.opts);
                 
                 let html = `
-                <div class="question-block" id="mcq-block-${qIndex}">
-                    <p class="font-bold mb-2">Câu ${qIndex + 1}: <span class="font-normal">${question.q}</span> <span id="mark-mcq-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pl-4">`;
+                <div class="question-block px-2 md:px-0" id="mcq-block-${qIndex}">
+                    <p class="font-bold mb-3 leading-relaxed">Câu ${qIndex + 1}: <span class="font-normal">${question.q}</span> <span id="mark-mcq-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 md:pl-4">`;
 
                 shuffledOpts.forEach((opt, optIndex) => {
                     html += `
-                        <label class="flex items-start gap-2 cursor-pointer p-1 rounded transition-colors" id="label-mcq-${qIndex}-${optIndex}">
-                            <input type="radio" name="mcq-${qIndex}" value="${opt.c}" class="mt-1">
-                            <span><span class="font-bold">${labels[optIndex]}.</span> ${opt.t}</span>
+                        <label class="flex items-start gap-3 cursor-pointer p-3 md:p-2 rounded-lg transition-colors border border-transparent hover:bg-gray-50 active:bg-gray-200" id="label-mcq-${qIndex}-${optIndex}">
+                            <input type="radio" name="mcq-${qIndex}" value="${opt.c}">
+                            <span class="leading-snug pt-0.5"><span class="font-bold">${labels[optIndex]}.</span> ${opt.t}</span>
                         </label>`;
                 });
 
@@ -217,14 +224,14 @@
 
             currentTFs.forEach((question, qIndex) => {
                 let html = `
-                <div class="question-block flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-gray-200 pb-3" id="tf-block-${qIndex}">
-                    <p class="font-bold w-full md:w-3/4">Câu ${qIndex + 6}: <span class="font-normal">${question.q}</span> <span id="mark-tf-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
-                    <div class="flex gap-6 pl-4 md:pl-0 shrink-0">
-                        <label class="flex items-center gap-1 cursor-pointer p-1 rounded" id="label-tf-${qIndex}-true">
+                <div class="question-block flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-2 border-b border-gray-200 pb-5 md:pb-3 px-2 md:px-0" id="tf-block-${qIndex}">
+                    <p class="font-bold w-full md:w-[70%] leading-relaxed">Câu ${qIndex + 6}: <span class="font-normal">${question.q}</span> <span id="mark-tf-${qIndex}" class="text-red-600 font-bold text-xl md:text-2xl ml-2"></span></p>
+                    <div class="flex gap-4 w-full md:w-auto shrink-0">
+                        <label class="flex-1 md:flex-none flex justify-center items-center gap-2 cursor-pointer p-3 md:p-2 rounded-lg border border-gray-300 md:border-transparent active:bg-gray-100 transition-colors" id="label-tf-${qIndex}-true">
                             <input type="radio" name="tf-${qIndex}" value="true">
                             <span class="font-bold text-green-700">Đúng (Đ)</span>
                         </label>
-                        <label class="flex items-center gap-1 cursor-pointer p-1 rounded" id="label-tf-${qIndex}-false">
+                        <label class="flex-1 md:flex-none flex justify-center items-center gap-2 cursor-pointer p-3 md:p-2 rounded-lg border border-gray-300 md:border-transparent active:bg-gray-100 transition-colors" id="label-tf-${qIndex}-false">
                             <input type="radio" name="tf-${qIndex}" value="false">
                             <span class="font-bold text-red-700">Sai (S)</span>
                         </label>
@@ -251,6 +258,9 @@
                     const label = document.getElementById(`label-mcq-${qIndex}-${optIndex}`);
                     radio.disabled = true; // Khóa sau khi nộp
                     
+                    // Xóa class viền hover/mặc định để chuẩn bị bôi màu chấm điểm
+                    label.classList.remove('border-transparent', 'hover:bg-gray-50');
+
                     if(radio.value === "true") {
                         label.classList.add('correct-answer'); // Luôn hiện đáp án đúng
                     }
@@ -278,6 +288,9 @@
                 
                 radioTrue.disabled = true;
                 radioFalse.disabled = true;
+
+                labelTrue.classList.remove('border-gray-300', 'md:border-transparent');
+                labelFalse.classList.remove('border-gray-300', 'md:border-transparent');
 
                 const correctStr = String(question.c); // "true" hoặc "false"
                 let isCorrect = false;
